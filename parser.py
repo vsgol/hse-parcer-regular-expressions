@@ -92,19 +92,11 @@ class Char(Derives):
 class Seq(Derives):
     def __init__(self, f, s, *args):
         if len(args) > 0:
-            if isinstance(f, Empty):
-                self.first = Empty()
-                self.second = Empty()
-            else:
-                self.first = f
-                self.second = Seq(s, args[0], *args[1:])
+            self.first = reduce(f)
+            self.second = reduce(Seq(s, args[0], *args[1:]))
         else:
-            if isinstance(f, Empty) or isinstance(s, Empty):
-                self.first = Empty()
-                self.second = Empty()
-            else:
-                self.first = f
-                self.second = s
+            self.first = reduce(f)
+            self.second = reduce(s)
 
     def __eq__(self, other):
         if not isinstance(other, Seq):
@@ -118,17 +110,11 @@ class Seq(Derives):
 class Alt(Derives):
     def __init__(self, f, s, *args):
         if len(args) > 0:
-            if f == s:
-                self.first = Empty()
-            else:
-                self.first = f
-            self.second = Alt(s, args[0], *args[1:])
+            self.first = reduce(f)
+            self.second = reduce(Alt(s, args[0], *args[1:]))
         else:
-            if f == s:
-                self.first = Empty()
-            else:
-                self.first = f
-            self.second = s
+            self.first = reduce(f)
+            self.second = reduce(s)
 
     def __eq__(self, other):
         if not isinstance(other, Alt):
@@ -141,10 +127,7 @@ class Alt(Derives):
 
 class Star(Derives):
     def __init__(self, f):
-        if isinstance(f, Star):
-            self.first = f.first
-        else:
-            self.first = f
+        self.first = reduce(f)
 
     def __eq__(self, other):
         if not isinstance(other, Star):
@@ -155,6 +138,35 @@ class Star(Derives):
         return "(Star {})".format(self.first)
 
 
-'''
-Что если сделать функцию reduce, которая принимает класс и уменьшает его
-'''
+def reduce(d):
+    if isinstance(d, (Eps, Empty, Char)):
+        return d
+
+    if isinstance(d, Seq):
+        if isinstance(d.first, Empty) or isinstance(d.second, Empty):
+            return Empty()
+        if isinstance(d.first, Eps):
+            return d.second
+        if isinstance(d.second, Eps):
+            return d.first
+        return d
+
+    if isinstance(d, Star):
+        if isinstance(d.first, (Eps, Empty)):
+            return Eps()
+        if isinstance(d.first, Star):
+            return d.first
+        return d
+
+    if isinstance(d, Alt):
+        if isinstance(d.first, Empty):
+            return d.second
+        if isinstance(d.second, Empty):
+            return d.first
+        if isinstance(d.first, Eps) and nullable(d.second):
+            return d.second
+        if isinstance(d.second, Eps) and nullable(d.first):
+            return d.first
+        if d.first == d.second:
+            return d.first
+        return d

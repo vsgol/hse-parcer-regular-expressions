@@ -58,22 +58,22 @@ class TestAll(unittest.TestCase):
 
         self.assertTrue(float_("17523.1423123e-12127653"))
         self.assertFalse(float_("17523.1423123e-12-2"))
-        self.assertTrue(float_("1" * 160 + "." + "1e+" + "1" * 300))
+        self.assertTrue(float_("1" * 300 + "." + "1e+" + "1" * 300))
 
 
 class TestSpeedSlow(unittest.TestCase):
     def test_Complicated(self):
-        sys.setrecursionlimit(2000)
         aaa = pr.Alt(pr.Seq(pr.Char('a'), pr.Seq(pr.Char('a'), pr.Star(pr.Char('a')))), pr.Star(pr.Char('a')),
                      pr.Star(pr.Char('a')))
-        self.assertTrue(aaa("a" * 350))
+        self.assertTrue(aaa("a" * 800))
 
 
 class TestSpeedFast(unittest.TestCase):
     def test_Easy(self):
         a = pr.Star(pr.Char('a'))
-        self.assertTrue(a("a" * 350))
+        self.assertTrue(a("a" * 750))
 
 
 if __name__ == '__main__':
+    sys.setrecursionlimit(4000)
     unittest.main()
