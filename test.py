@@ -56,6 +56,18 @@ class TestAll(unittest.TestCase):
                                                     pr.Eps())),
                                       pr.Eps())))
 
+        self.assertTrue(digit("1"))
+        self.assertFalse(digit("a"))
+
+        self.assertTrue(number("1"))
+        self.assertTrue(number("+1"))
+        self.assertTrue(number("-1"))
+        self.assertTrue(number("+0"))
+        self.assertTrue(number("-1121241291281683"))
+        self.assertFalse(number("a"))
+        self.assertFalse(number("-"))
+        self.assertFalse(number("-01"))
+
         self.assertTrue(float_("17523.1423123e-12127653"))
         self.assertFalse(float_("17523.1423123e-12-2"))
         self.assertTrue(float_("1" * 300 + "." + "1e+" + "1" * 300))
@@ -66,6 +78,9 @@ class TestSpeedSlow(unittest.TestCase):
         aaa = pr.Alt(pr.Seq(pr.Char('a'), pr.Seq(pr.Char('a'), pr.Star(pr.Char('a')))), pr.Star(pr.Char('a')),
                      pr.Star(pr.Char('a')))
         self.assertTrue(aaa("a" * 800))
+
+        ab = pr.Star(pr.Alt(pr.Char('a'), pr.Char('b'), pr.Char('cd')))
+        self.assertTrue(ab("a" * 800))
 
 
 class TestSpeedFast(unittest.TestCase):
