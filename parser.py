@@ -11,17 +11,13 @@ def nullable(c):
 
 
 class Derives(object):
-    def __call__(self, w, f=None):
-        if f is None:
-            f = self
-
-        if w == "":
-            return nullable(f)
-
-        if isinstance(f, EmptyC):
-            return False
-
-        return self.__call__(w[1:], self.derivative(w[0], f))
+    def __call__(self, w):
+        f = self
+        for c in w:
+            f = f.derivative(c)
+            if isinstance(f, EmptyC):
+                return False
+        return nullable(f)
 
     def derivative(self, c, o=None):
         if o is None:
@@ -153,6 +149,8 @@ def Seq(f, s, *args):
         return Seq(s, args[0], *args[1:]) if len(args) else s
     if isinstance(s, EpsC):
         return Seq(f, args[0], *args[1:]) if len(args) else f
+    if isinstance(f, StarC) and f == s:
+        return f
     return SeqC(f, s, *args)
 
 
