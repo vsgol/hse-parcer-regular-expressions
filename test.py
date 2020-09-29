@@ -7,7 +7,7 @@ class TestChar(unittest.TestCase):
     def test_Char(self):
         a = pr.Char('a')
 
-        self.assertFalse(a(""))
+        self.assertFalse(pr.Char('a')(""))
         self.assertFalse(a("b"))
         self.assertFalse(a("aa"))
         self.assertTrue(a("a"))
@@ -69,13 +69,13 @@ class TestSeq(unittest.TestCase):
         self.assertFalse(aaa("aab"))
         self.assertFalse(aaa(""))
 
-        aaaa = pr.Seq(*[pr.Char(i) for i in "a"*300])
+        aaaa = pr.Seq(*[pr.Char(i) for i in "a"*150])
 
         self.assertFalse(aaaa("aa"))
         self.assertFalse(aaaa("aaaa"))
         self.assertFalse(aaaa("aab"))
         self.assertFalse(aaaa(""))
-        self.assertTrue(aaaa("a"*300))
+        self.assertTrue(aaaa("a"*150))
 
     def test_Alt(self):
         ab = pr.Seq(pr.Alt(pr.Char('a'), pr.Char('b')), pr.Char('a'))
